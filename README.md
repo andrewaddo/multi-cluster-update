@@ -16,6 +16,13 @@ The objective is to show that having multiple clusters allows the update to be d
 - **GKE Fleet**: Both clusters are registered to the same Fleet.
 - **Canary Rollout**: Traffic weighting via `HTTPRoute`.
 
+### Design Decision: Multi-Cluster Gateway vs. Standard Load Balancer
+While it is possible to achieve zero-downtime routing using a manually managed Google Cloud Application Load Balancer and Standalone Network Endpoint Groups (NEGs), this project uses the **Multi-Cluster Gateway (MCG)** for several key advantages:
+1. **Kubernetes-Native Workflow (No "Split-Brain"):** Routing rules (`Gateway`, `HTTPRoute`, `ServiceExport`) live directly alongside application manifests, making them fully compatible with GitOps workflows (e.g., ArgoCD, Flux) without needing to context-switch to Terraform or `gcloud`.
+2. **Automated Service Discovery & Plumbing:** MCG leverages the Multi-Cluster Services (MCS) API. When a `ServiceExport` is created, the GKE controller automatically discovers it, generates the necessary NEGs, and wires them directly into the Load Balancer, eliminating manual infrastructure plumbing.
+3. **Granular Role Separation (RBAC):** The Gateway API natively supports Kubernetes role-based access control. Platform Admins can manage the `Gateway` (infrastructure), while Application Developers can safely manage their own `HTTPRoute` (canary traffic splits) within their namespace without requiring privileged IAM access to GCP Load Balancers.
+4. **Portability:** The `HTTPRoute` API is the open-source industry standard (the successor to `Ingress`). Standardizing on the Kubernetes Gateway API prevents vendor lock-in to proprietary cloud APIs (like GCP URL Maps) and allows the same routing logic to be used across different environments or service meshes.
+
 ### Design Decision: DNS-based Routing
 This project uses **DNS as the primary router** to ensure zero downtime during the transition between a single-cluster Load Balancer and a Multi-cluster Gateway.
 
