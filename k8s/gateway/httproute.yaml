@@ -11,11 +11,11 @@ spec:
   - backendRefs:
     - group: net.gke.io
       kind: ServiceImport
-      name: gke-demo-svc-v129
+      name: gke-demo-svc-v132
       port: 80
       weight: 100
     - group: net.gke.io
       kind: ServiceImport
-      name: gke-demo-svc-v130
+      name: gke-demo-svc-v133
       port: 80
       weight: 0

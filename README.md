@@ -4,10 +4,10 @@ This project demonstrates a zero-downtime, low-risk GKE version update within a 
 
 ## Objective
 The objective is to show that having multiple clusters allows the update to be done with minimal downtime and minimal risk of disruption.
-1.  **Stage 1: Baseline (v1.29)**: Primary cluster running the old version.
-2.  **Stage 2: Expansion (v1.30)**: Secondary cluster running the new version.
+1.  **Stage 1: Baseline (v1.32)**: Primary cluster running the old version.
+2.  **Stage 2: Expansion (v1.33)**: Secondary cluster running the new version.
 3.  **Stage 3: Gateway Setup**: Introduce Multi-Cluster Gateway for traffic management.
-4.  **Stage 4: Canary Update**: Shift traffic from v1.29 to v1.30.
+4.  **Stage 4: Canary Update**: Shift traffic from v1.32 to v1.33.
 5.  **Stage 5: Post-Migration Cleanup**: Settle on the new version and decommission the old.
 
 ## Architecture
@@ -18,7 +18,7 @@ The objective is to show that having multiple clusters allows the update to be d
 
 ## Project Structure
 - `app/`: Simple FastAPI application reporting cluster and version.
-- `infra/`: Terraform for VPC, GKE clusters, and Fleet registration.
+- `infra/`: Modular `gcloud` infrastructure scripts.
 - `k8s/`: Kubernetes manifests for Gateway, HTTPRoute, and App.
 - `demo_stages/`: Sequential scripts for the demonstration.
 - `scripts/`: Utility scripts including `performance_test.py`.
@@ -32,19 +32,19 @@ The project includes a custom `performance_test.py` script to verify **zero down
 ## How to Run the Demo
 
 ### 1. Setup Baseline
-Provisions VPC and the first GKE cluster (v1.29).
+Provisions VPC and the first GKE cluster (v1.32).
 ```bash
 ./demo_stages/01_setup_baseline.sh
 ```
 
 ### 2. Expand with New Version
-Provisions the second GKE cluster (v1.30) and registers to the Fleet.
+Provisions the second GKE cluster (v1.33) and registers to the Fleet.
 ```bash
 ./demo_stages/02_expand_new_version.sh
 ```
 
 ### 3. Setup Multi-Cluster Gateway
-Introduces the MCG and prepares for traffic shifting.
+Introduces the MCG and prepares for traffic shifting using version-specific services.
 ```bash
 ./demo_stages/03_setup_gateway.sh
 ```

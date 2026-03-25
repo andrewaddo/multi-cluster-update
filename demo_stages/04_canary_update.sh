@@ -24,12 +24,12 @@ spec:
   - backendRefs:
     - group: net.gke.io
       kind: ServiceImport
-      name: gke-demo-svc-v129
+      name: gke-demo-svc-v132
       port: 80
       weight: 50
     - group: net.gke.io
       kind: ServiceImport
-      name: gke-demo-svc-v130
+      name: gke-demo-svc-v133
       port: 80
       weight: 50
 EOF
@@ -52,12 +52,12 @@ spec:
   - backendRefs:
     - group: net.gke.io
       kind: ServiceImport
-      name: gke-demo-svc-v129
+      name: gke-demo-svc-v132
       port: 80
       weight: 0
     - group: net.gke.io
       kind: ServiceImport
-      name: gke-demo-svc-v130
+      name: gke-demo-svc-v133
       port: 80
       weight: 100
 EOF
@@ -66,5 +66,5 @@ echo "--------------------------------------------------"
 echo "STAGE 4 COMPLETE"
 echo "Next Steps:"
 echo "1. Verify 100% traffic is on cluster-new."
-echo "2. Run final performance report: python3 scripts/performance_test.py http://35.209.116.46/status --output stage4_post_update.csv"
+echo "2. Run final performance report: python3 scripts/performance_test.py http://<GATEWAY_IP>/status --output stage4_post_update.csv"
 echo "--------------------------------------------------"
