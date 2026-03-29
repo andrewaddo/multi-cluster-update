@@ -52,24 +52,61 @@ The project includes a custom `performance_test.py` script to verify **zero down
 
 ### 1. Setup Baseline
 Provisions VPC and the first GKE cluster (v1.32).
+
+```mermaid
+flowchart LR
+    U(Users) --> D[DNS: app.demo.gke]
+    D --> LB[Standard LB]
+    LB --> C1[Cluster Old: v1.32]
+```
 ```bash
 ./demo_stages/01_setup_baseline.sh
 ```
 
 ### 2. Expand with New Version
 Provisions the second GKE cluster (v1.33) and registers to the Fleet.
+
+```mermaid
+flowchart LR
+    U(Users) --> D[DNS: app.demo.gke]
+    D --> LB[Standard LB]
+    LB --> C1[Cluster Old: v1.32]
+    
+    C2[Cluster New: v1.33]
+```
 ```bash
 ./demo_stages/02_expand_new_version.sh
 ```
 
 ### 3. Setup Multi-Cluster Gateway
 Introduces the MCG and prepares for traffic shifting using version-specific services.
+
+```mermaid
+flowchart LR
+    U(Users) --> D[DNS: app.demo.gke]
+    D --> LB[Standard LB]
+    LB --> C1[Cluster Old: v1.32]
+
+    GW[Multi-Cluster Gateway] -. "100%" .-> C1
+    GW -. "0%" .-> C2[Cluster New: v1.33]
+```
 ```bash
 ./demo_stages/03_setup_gateway.sh
 ```
 
 ### 4. Perform Canary Upgrade
 Execute the traffic shift while running the load tester in another terminal.
+
+```mermaid
+flowchart LR
+    U(Users) --> D[DNS: app.demo.gke]
+    D --> GW[Multi-Cluster Gateway]
+
+    GW -- "50% -> 0%" --> C1[Cluster Old: v1.32]
+    GW -- "50% -> 100%" --> C2[Cluster New: v1.33]
+
+    LB[Standard LB] -. "decommissioning" .-> C1
+```
 ```bash
 # Terminal 1: Load Tester
 python3 scripts/performance_test.py http://app.demo.gke/status --resolve app.demo.gke:<GATEWAY_IP> --rps 5 --duration 0 --output migration_transition.csv
@@ -79,6 +116,13 @@ python3 scripts/performance_test.py http://app.demo.gke/status --resolve app.dem
 ```
 
 ### 5. Cleanup
+
+```mermaid
+flowchart LR
+    U(Users) --> D[DNS: app.demo.gke]
+    D --> GW[Multi-Cluster Gateway]
+    GW --> C2[Cluster New: v1.33]
+```
 ```bash
 ./demo_stages/05_cleanup.sh
 ```
